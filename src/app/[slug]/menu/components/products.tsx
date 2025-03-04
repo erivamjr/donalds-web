@@ -1,26 +1,33 @@
-import { Product } from "@prisma/client"
-import Image from "next/image"
-import Link from "next/link"
-import { useParams } from "next/navigation"
+import { Product } from "@prisma/client";
+import Image from "next/image";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+
+import { formatCurrency } from "../../../../helpers/formar-currency";
 
 interface ProductsProps {
- products: Product[ ] 
+  products: Product[];
 }
 
-const Products = ({products}: ProductsProps) => {
-  const {slug} = useParams<{slug: string}>()
+const Products = ({ products }: ProductsProps) => {
+  const { slug } = useParams<{ slug: string }>();
   return (
     <div className="space-y-3 px-5">
       {products.map((product) => (
-        <Link 
-        key={product.id} href={`/${slug}/menu/${product.id}`}
-        className="flex items-center justify-between gap-10 py-5 border-b"
+        <Link
+          key={product.id}
+          href={`/${slug}/menu/${product.id}`}
+          className="flex items-center justify-between gap-10 border-b py-5"
         >
           {/* ESQUERDA */}
           <div>
             <h3 className="text-sm font-medium">{product.name}</h3>
-            <p className="line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
-            <p className="pt-3 font-semibold text-sm">{Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}</p>
+            <p className="line-clamp-2 text-sm text-muted-foreground">
+              {product.description}
+            </p>
+            <p className="pt-3 text-sm font-semibold">
+              {formatCurrency(product.price)}
+            </p>
           </div>
 
           {/* DIREITA */}
@@ -29,13 +36,13 @@ const Products = ({products}: ProductsProps) => {
               src={product.imageUrl}
               alt={product.name}
               fill
-              className="object-contain rounded-lg"
+              className="rounded-lg object-contain"
             />
           </div>
         </Link>
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default Products
+export default Products;
