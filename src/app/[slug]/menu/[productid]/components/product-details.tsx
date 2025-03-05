@@ -9,7 +9,7 @@ import { Button } from "../../../../../components/ui/button";
 import { ScrollArea } from "../../../../../components/ui/scroll-area";
 import { formatCurrency } from "../../../../../helpers/formar-currency";
 import CartSheet from "../../components/cart-sheet";
-import { CartContext } from "../../context/cat";
+import { CartContext } from "../../context/cart";
 
 interface ProductDetailsProps {
   product: Prisma.ProductGetPayload<{
@@ -19,7 +19,7 @@ interface ProductDetailsProps {
 
 const ProductDetails = ({ product }: ProductDetailsProps) => {
   const [quantity, setQuantity] = useState(1);
-  const { toggleCart } = useContext(CartContext);
+  const { toggleCart, addProduct } = useContext(CartContext);
 
   const handleDecreaseQuantity = () =>
     setQuantity((prev) => (prev === 1 ? 1 : prev - 1));
@@ -27,6 +27,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
   const handleIncreaseQuantity = () => setQuantity((prev) => prev + 1);
 
   const handleAddToCart = () => {
+    addProduct({ ...product, quantity });
     toggleCart();
   };
   return (

@@ -3,7 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 
-import { CartProvider } from "./[slug]/menu/context/cat";
+import { CartProvider } from "./[slug]/menu/context/cart";
 
 const poppins = Poppins({
   subsets: ["latin"],
