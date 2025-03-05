@@ -27,8 +27,13 @@ const formSchema = z.object({
 type FormSchema = z.infer<typeof formSchema>;
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ConsumptionMethod } from "@prisma/client";
+import { Loader2, Loader2Icon } from "lucide-react";
+import { useParams, useSearchParams } from "next/navigation";
+import { useContext, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { PatternFormat } from "react-number-format";
+import { toast } from "sonner";
 
 import { Button } from "../../../../components/ui/button";
 import {
@@ -41,6 +46,8 @@ import {
 } from "../../../../components/ui/form";
 import { Input } from "../../../../components/ui/input";
 import { isValidCpf } from "../../../../helpers/cpf";
+import { createOrder } from "../actions/create-order";
+import { CartContext } from "../context/cart";
 
 interface FinishedOrderButtonProps {
   open: boolean;
@@ -51,6 +58,10 @@ const FinishedOrderDialog = ({
   open,
   onOpenChange,
 }: FinishedOrderButtonProps) => {
+  const { slug } = useParams<{ slug: string }>();
+  const searchParams = useSearchParams();
+  const { products } = useContext(CartContext);
+  const [isPendding, startTransition] = useTransition();
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -59,8 +70,26 @@ const FinishedOrderDialog = ({
     },
   });
 
-  const onSubmit = (data: FormSchema) => {
-    console.log(data);
+  const onSubmit = async (data: FormSchema) => {
+    try {
+      const consumptionMethod = searchParams.get(
+        "consumptionMethod",
+      ) as ConsumptionMethod;
+
+      startTransition(async () => {
+        await createOrder({
+          consumptionMethod,
+          customerCpf: data.cpf,
+          customerName: data.name,
+          products,
+          slug,
+        });
+        onOpenChange(false);
+        toast.success("Pedido realizado com sucesso!");
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -112,7 +141,11 @@ const FinishedOrderDialog = ({
                   type="submit"
                   variant={"destructive"}
                   className="rounded-full"
+                  disabled={isPendding}
                 >
+                  {isPendding && (
+                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Finalizar
                 </Button>
                 <DrawerClose>
