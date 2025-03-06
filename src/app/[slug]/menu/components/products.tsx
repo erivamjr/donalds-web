@@ -33,7 +33,7 @@ const Products = ({ products }: ProductsProps) => {
           </div>
 
           {/* DIREITA */}
-          <div className="relative min-h-[82px] min-w-[120px]">
+          <div className="relative min-h-[82px] min-w-[82px] rounded-lg bg-gray-200">
             <Image
               src={product.imageUrl}
               alt={product.name}
