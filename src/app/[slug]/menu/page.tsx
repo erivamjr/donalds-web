@@ -1,47 +1,50 @@
-import { notFound } from "next/navigation"
+import { notFound } from "next/navigation";
 
-import { db } from "../../../lib/prisma"
-import RestaurantCategories from "./components/category"
-import RestaurantHeader from "./components/header"
+import { db } from "../../../lib/prisma";
+import RestaurantCategories from "./components/categories";
+import RestaurantHeader from "./components/header";
 
 interface RestaurantMenuPageProps {
-  params: Promise<{ slug: string }> 
-  searchParams: Promise<{ consumptionMethod: string }>
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ consumptionMethod: string }>;
 }
 
 const iaConsumptionMethodValid = (consumptionMethod: string) => {
-  return ["DINE_IN", "TAKEAWAY"].includes(consumptionMethod)
-}
+  return ["DINE_IN", "TAKEAWAY"].includes(consumptionMethod);
+};
 
-const RestaurantMenuPage = async ({ params,searchParams }: RestaurantMenuPageProps) => {
-  const { slug } = await params
-  const { consumptionMethod } = await searchParams
+const RestaurantMenuPage = async ({
+  params,
+  searchParams,
+}: RestaurantMenuPageProps) => {
+  const { slug } = await params;
+  const { consumptionMethod } = await searchParams;
 
   if (!iaConsumptionMethodValid(consumptionMethod)) {
-    return notFound()
+    return notFound();
   }
   const restaurant = await db.restaurant.findUnique({
     where: {
-      slug
+      slug,
     },
     include: {
-      menuCategories:{
+      menuCategories: {
         include: {
-          products: true
-        }
-      }
-    }
-  })
+          products: true,
+        },
+      },
+    },
+  });
 
   if (!restaurant) {
-    return notFound()
+    return notFound();
   }
   return (
     <div>
-     <RestaurantHeader restaurant={restaurant} />
-     <RestaurantCategories restaurant={restaurant} />
+      <RestaurantHeader restaurant={restaurant} />
+      <RestaurantCategories restaurant={restaurant} />
     </div>
-  )
-}
+  );
+};
 
-export default RestaurantMenuPage
+export default RestaurantMenuPage;
